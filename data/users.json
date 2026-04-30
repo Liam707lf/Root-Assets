@@ -1,1 +1,7 @@
-[]
+[
+  {
+    "username": "alice",
+    "password": "hunter2",
+    "createdAt": "2026-04-30T17:34:47.836Z"
+  }
+]
