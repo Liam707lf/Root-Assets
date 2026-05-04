@@ -6,7 +6,7 @@ const session = require('express-session');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
-const USERS_FILE = path.join(__dirname, 'data', 'users.json');
+const USERS_FILE = path.join(__dirname, 'users.json');
 
 function readUsers() {
   try {
