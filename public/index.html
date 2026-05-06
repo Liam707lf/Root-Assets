@@ -3,125 +3,26 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Futuristic Game Login</title>
-    <style>
-        body {
-            font-family: 'Orbitron', sans-serif;
-            background-color: #0a0a1a;
-            color: #00ffcc;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-            overflow: hidden;
-            position: relative;
-        }
-
-        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap');
-
-        body::before {
-            content: "";
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background:
-                radial-gradient(circle at 10% 20%, rgba(0, 255, 204, 0.1) 0%, transparent 30%),
-                radial-gradient(circle at 90% 80%, rgba(100, 0, 255, 0.1) 0%, transparent 30%);
-            z-index: -1;
-        }
-
-        .container {
-            text-align: center;
-            background: rgba(10, 10, 26, 0.8);
-            padding: 40px;
-            border-radius: 15px;
-            border: 2px solid rgba(0, 255, 204, 0.3);
-            box-shadow: 0 0 20px rgba(0, 255, 204, 0.2), 0 0 40px rgba(100, 0, 255, 0.2);
-            backdrop-filter: blur(5px);
-            width: 350px;
-            animation: glow 2s infinite alternate;
-        }
-
-        @keyframes glow {
-            from {
-                box-shadow: 0 0 20px rgba(0, 255, 204, 0.2), 0 0 40px rgba(100, 0, 255, 0.2);
-            }
-            to {
-                box-shadow: 0 0 30px rgba(0, 255, 204, 0.4), 0 0 60px rgba(100, 0, 255, 0.4);
-            }
-        }
-
-        h1 {
-            font-size: 2.5em;
-            margin-bottom: 30px;
-            text-shadow: 0 0 10px rgba(0, 255, 204, 0.7);
-        }
-
-        .input-group {
-            margin-bottom: 20px;
-            text-align: left;
-        }
-
-        label {
-            display: block;
-            margin-bottom: 8px;
-            font-size: 0.9em;
-            color: rgba(0, 255, 204, 0.8);
-        }
-
-        input {
-            width: 100%;
-            padding: 12px;
-            background: rgba(0, 0, 0, 0.5);
-            border: 1px solid rgba(0, 255, 204, 0.3);
-            border-radius: 5px;
-            color: #00ffcc;
-            font-family: 'Orbitron', sans-serif;
-            box-sizing: border-box;
-            outline: none;
-            transition: border 0.3s;
-        }
-
-        input:focus {
-            border: 1px solid rgba(0, 255, 204, 0.8);
-        }
-
-        button {
-            width: 100%;
-            padding: 12px;
-            background: linear-gradient(90deg, #00ffcc, #6a00ff);
-            border: none;
-            border-radius: 5px;
-            color: #0a0a1a;
-            font-family: 'Orbitron', sans-serif;
-            font-weight: bold;
-            cursor: pointer;
-            transition: background 0.3s;
-            margin-top: 10px;
-        }
-
-        button:hover {
-            background: linear-gradient(90deg, #6a00ff, #00ffcc);
-        }
-    </style>
+    <title>Foodie Tic Tac Toe Login</title>
+    <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <div class="container">
-        <h1>Welcome to the Game</h1>
-        <form>
+        <h1>🍕 Foodie Tic Tac Toe 🍔</h1>
+        <form id="login-form">
             <div class="input-group">
-                <label for="username">Username:</label>
-                <input type="text" id="username" placeholder="Enter your username" required>
+                <label for="username">Chef's Name:</label>
+                <input type="text" id="username" placeholder="Enter your chef name" required>
             </div>
             <div class="input-group">
-                <label for="password">Password:</label>
-                <input type="password" id="password" placeholder="Enter your password" required>
+                <label for="password">Secret Recipe:</label>
+                <input type="password" id="password" placeholder="Enter your secret recipe" required>
             </div>
-            <button type="submit">Login / Start Game</button>
+            <button type="submit" class="food-button">Login & Start Cooking!</button>
+            <p id="status-message"></p>
         </form>
     </div>
+    <script src="main.js"></script>
 </body>
 </html>
