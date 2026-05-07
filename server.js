@@ -6,7 +6,8 @@ const session = require('express-session');
 const cors = require('cors');
 
 const app = express();
-const PORT = process.env.PORT || 3000; // Changed from 5000 to 3000
+// Configurable port: Uses Replit's default (5000) or falls back to 3000 for local testing
+const PORT = process.env.PORT || 5000 || 3000;
 const USERS_FILE = path.join(__dirname, 'users.json');
 
 // Middleware
@@ -22,18 +23,28 @@ app.use(
 
 app.use(express.static(path.join(__dirname, 'public')));
 
+// Ensure users.json exists
+if (!fs.existsSync(USERS_FILE)) {
+  fs.writeFileSync(USERS_FILE, '[]', 'utf-8');
+}
+
 // Helper functions for user management
 function readUsers() {
   try {
     const raw = fs.readFileSync(USERS_FILE, 'utf-8').trim();
     return raw ? JSON.parse(raw) : [];
   } catch (err) {
+    console.error('Error reading users.json:', err);
     return [];
   }
 }
 
 function writeUsers(users) {
-  fs.writeFileSync(USERS_FILE, JSON.stringify(users, null, 2));
+  try {
+    fs.writeFileSync(USERS_FILE, JSON.stringify(users, null, 2));
+  } catch (err) {
+    console.error('Error writing to users.json:', err);
+  }
 }
 
 // Health check endpoint
