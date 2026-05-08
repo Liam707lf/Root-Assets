@@ -52,6 +52,35 @@ app.get('/api/health', (req, res) => {
   res.json({ ok: true, time: new Date().toISOString() });
 });
 
+// Signup endpoint
+app.post('/api/signup', (req, res) => {
+  const { username, password } = req.body || {};
+
+  if (!username || !password) {
+    return res.status(400).json({ error: 'Username and password are required' });
+  }
+
+  const users = readUsers();
+  const existing = users.find(u => u.username === username);
+
+  if (existing) {
+    return res.status(400).json({ error: 'Username already exists' });
+  }
+
+  const newUser = {
+    username,
+    password,
+    createdAt: new Date().toISOString(),
+    games: [],  // Initialize gameplay history
+    wins: 0,
+    losses: 0
+  };
+  users.push(newUser);
+  writeUsers(users);
+
+  res.json({ created: true, user: { username: newUser.username } });
+});
+
 // Login endpoint
 app.post('/api/login', (req, res) => {
   const { username, password } = req.body || {};
@@ -68,14 +97,37 @@ app.post('/api/login', (req, res) => {
       return res.status(401).json({ error: 'Incorrect password' });
     }
     req.session.userId = existing.username;
-    return res.json({ created: false, user: { username: existing.username } });
+    return res.json({ created: false, user: { username: existing.username, wins: existing.wins, losses: existing.losses } });
   }
 
-  const newUser = { username, password, createdAt: new Date().toISOString() };
+  const newUser = { username, password, createdAt: new Date().toISOString(), games: [], wins: 0, losses: 0 };
   users.push(newUser);
   writeUsers(users);
   req.session.userId = newUser.username;
-  return res.json({ created: true, user: { username: newUser.username } });
+  return res.json({ created: true, user: { username: newUser.username, wins: newUser.wins, losses: newUser.losses } });
+});
+
+// Update user stats endpoint
+app.post('/api/update-stats', (req, res) => {
+  const { username, result } = req.body;
+  if (!username || !result) {
+    return res.status(400).json({ error: 'Username and result are required' });
+  }
+
+  const users = readUsers();
+  const userIndex = users.findIndex(u => u.username === username);
+  if (userIndex === -1) {
+    return res.status(404).json({ error: 'User not found' });
+  }
+
+  // Update user stats
+  users[userIndex].games = users[userIndex].games || [];
+  users[userIndex].games.push({ result, date: new Date().toISOString() });
+  users[userIndex].wins = (users[userIndex].wins || 0) + (result === 'win' ? 1 : 0);
+  users[userIndex].losses = (users[userIndex].losses || 0) + (result === 'loss' ? 1 : 0);
+
+  writeUsers(users);
+  res.json({ success: true, user: users[userIndex] });
 });
 
 // Logout endpoint
@@ -86,7 +138,10 @@ app.post('/api/logout', (req, res) => {
 // Get current user endpoint
 app.get('/api/me', (req, res) => {
   if (!req.session.userId) return res.json({ user: null });
-  res.json({ user: { username: req.session.userId } });
+  const users = readUsers();
+  const user = users.find(u => u.username === req.session.userId);
+  if (!user) return res.json({ user: null });
+  res.json({ user: { username: user.username, wins: user.wins, losses: user.losses } });
 });
 
 // Start the server
