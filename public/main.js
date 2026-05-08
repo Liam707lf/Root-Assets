@@ -29,12 +29,15 @@ document.getElementById('login-form').addEventListener('submit', async (event) =
 
             // Your server sends back a 'created' boolean if it's a new account
             if (data.created) {
-                 statusMessage.textContent = `Welcome! New account created for ${data.user.username}. Loading game...`;
+                statusMessage.textContent = `Welcome! New account created for ${data.user.username}. Loading game...`;
             } else {
-                 statusMessage.textContent = `Welcome back, ${data.user.username}! Loading game...`;
+                statusMessage.textContent = `Welcome back, ${data.user.username}! Loading game...`;
             }
 
-            // TODO: Add your code here to hide the login screen and show the game!
+            // Redirect to the game page after a short delay
+            setTimeout(() => {
+                window.location.href = '/game.html';
+            }, 1000); // 1-second delay
 
         } else {
             // If the server sends a 400 or 401 error, display the error message
