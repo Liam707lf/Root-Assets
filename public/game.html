@@ -29,6 +29,11 @@
             font-family: 'Pacifico', cursive;
             color: #d4a762;
         }
+        #user-stats {
+            font-size: 1em;
+            color: #5a4a3a;
+            margin-bottom: 10px;
+        }
         .board {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
@@ -70,6 +75,7 @@
 <body>
     <div class="game-container">
         <h1>🍕 Tic Tac Toe 🍔</h1>
+        <p id="user-stats">Loading your stats...</p>
         <p id="status">Your turn! Play as X.</p>
         <div class="board" id="board">
             <div class="cell" data-index="0"></div>
@@ -85,11 +91,8 @@
         <button class="logout-button" id="logout-button">Logout</button>
     </div>
     <script>
-        // Basic Tic Tac Toe game logic
-        const board = document.getElementById('board');
-        const cells = document.querySelectorAll('.cell');
-        const status = document.getElementById('status');
-        const logoutButton = document.getElementById('logout-button');
+        // Store current user
+        let currentUser = null;
         let currentPlayer = 'X';
 
         // Winning combinations
@@ -99,29 +102,70 @@
             [0, 4, 8], [2, 4, 6]             // Diagonals
         ];
 
+        // Fetch current user on page load
+        async function fetchCurrentUser() {
+            try {
+                const response = await fetch('/api/me');
+                const data = await response.json();
+                if (data.user) {
+                    currentUser = data.user.username;
+                    document.getElementById('user-stats').textContent = 
+                        `Welcome, ${data.user.username}! Wins: ${data.user.wins || 0}, Losses: ${data.user.losses || 0}`;
+                } else {
+                    window.location.href = '/';
+                }
+            } catch (error) {
+                console.error('Error fetching user:', error);
+                window.location.href = '/';
+            }
+        }
+
         // Initialize the game board
         function initGame() {
             cells.forEach(cell => {
                 cell.textContent = '';
                 cell.addEventListener('click', handleCellClick, { once: true });
             });
+            currentPlayer = 'X';
             status.textContent = `Your turn! Play as ${currentPlayer}.`;
         }
 
+        const board = document.getElementById('board');
+        const cells = document.querySelectorAll('.cell');
+        const status = document.getElementById('status');
+        const logoutButton = document.getElementById('logout-button');
+
         // Handle cell click
-        function handleCellClick(e) {
+        async function handleCellClick(e) {
             const cell = e.target;
             cell.textContent = currentPlayer;
             
             // Check for win
             if (checkWin()) {
+                const result = currentPlayer === 'X' ? 'win' : 'loss';
                 status.textContent = `Player ${currentPlayer} wins!`;
+                if (currentUser) {
+                    await saveGameResult(result);
+                }
+                setTimeout(() => {
+                    if (confirm('Play again?')) {
+                        initGame();
+                    }
+                }, 500);
                 return;
             }
             
             // Check for draw
             if ([...cells].every(cell => cell.textContent !== '')) {
                 status.textContent = 'Game ended in a draw!';
+                if (currentUser) {
+                    await saveGameResult('draw');
+                }
+                setTimeout(() => {
+                    if (confirm('Play again?')) {
+                        initGame();
+                    }
+                }, 500);
                 return;
             }
             
@@ -139,6 +183,28 @@
             });
         }
 
+        // Save game result
+        async function saveGameResult(result) {
+            if (!currentUser) return;
+            try {
+                const response = await fetch('/api/update-stats', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        username: currentUser,
+                        result: result
+                    })
+                });
+                const data = await response.json();
+                if (data.success) {
+                    document.getElementById('user-stats').textContent = 
+                        `Wins: ${data.user.wins}, Losses: ${data.user.losses}`;
+                }
+            } catch (error) {
+                console.error('Error saving game:', error);
+            }
+        }
+
         // Logout function
         logoutButton.addEventListener('click', async () => {
             try {
@@ -151,7 +217,8 @@
             }
         });
 
-        // Start the game
+        // Initialize the game and fetch user
+        fetchCurrentUser();
         initGame();
     </script>
 </body>
